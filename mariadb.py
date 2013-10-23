@@ -5,7 +5,7 @@
 # Author: Francois Conil
 
 from sys import argv
-import os
+from subprocess import Popen, PIPE
 import platform
 
 ver = "5.5 or 10.0"
@@ -23,7 +23,6 @@ else:
 
     arch = platform.architecture()[0]
     dist = platform.linux_distribution()
-
     
     repo_dist = dist[0].lower()  
     if repo_dist in ("centos","redhat", "fedora"):
@@ -49,22 +48,29 @@ else:
         f.close()
         
         #import GPG key
-        os.popen("rpm --import http://yum.mariadb.org/RPM-GPG-KEY-MariaDB")
+        Popen(["rpm", "--import", "http://yum.mariadb.org/RPM-GPG-KEY-MariaDB"])
  
     elif repo_dist in ("ubuntu", "debian"):
         #not tested yet
         #using australian mirror
-
+	if "jessie" in dist[1]:
+		dist_version = "wheezy"
+	elif "sid" in dist[1]:
+		dist_version = "wheezy"
+	else:
+		dist_version = dist[1]
+	
+	 
         f = open("/etc/apt/sources.list.d/MariaDB.list","w") 
         f.write("\n")
-        f.write("deb http://mirror.aarnet.edu.au/pub/MariaDB/repo/%s/%s %s main" % (version, repo_dist, dist[2]))
+        f.write("deb http://mirror.aarnet.edu.au/pub/MariaDB/repo/%s/%s %s main" % (version, repo_dist, dist_version))
         f.write("\n")
-        f.write("deb-src http://mirror.aarnet.edu.au/pub/MariaDB/repo/%s/%s %s main" % (version, repo_dist, dist[2]))
+        f.write("deb-src http://mirror.aarnet.edu.au/pub/MariaDB/repo/%s/%s %s main" % (version, repo_dist, dist_version))
         f.write("\n")
         f.close()
         
         #import GPG key
-        os.popen("apt-key adv --recv-keys --keyserver keyserver.ubuntu.com 0xcbcb082a1bb943db")
+	Popen(["/usr/bin/apt-key", "adv", "--recv-keys", "--keyserver", "keyserver.ubuntu.com", "0xcbcb082a1bb943db"])
 
  
     
