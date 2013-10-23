@@ -2,6 +2,7 @@
 
 # A quick script to automate what https://downloads.mariadb.org/mariadb/repositories/ does
 # v0.1 centos 6 Proof of concept
+# v0.2 handles sid/jessie, replaced os by subprocess
 # Author: Francois Conil
 
 from sys import argv
