@@ -1,6 +1,7 @@
 #!/bin/bash
 
+DAY=`date +%d`
 MONTH=`date +%m`
 YEAR=`date +%Y`
 
-./bin/jmeter -n -t login.jmx  -l log.jtl.$MONTH.$YEAR
+/opt/monitoring/bin/jmeter -n -t /opt/monitoring/login.jmx  -l /var/log/monitoring/log.jtl.$DAY.$MONTH.$YEAR
