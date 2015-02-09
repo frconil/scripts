@@ -1,31 +1,40 @@
 #!/bin/bash
 #
-# basic puppet syntax check 
-# 
+# basic puppet syntax check
+#
 
-for ppfile in `git diff --name-only HEAD~1 | grep "\.pp\|\.erb"` 
+for ppfile in `git diff --name-only HEAD~1 | grep "\.pp\|\.erb\|.yaml\|.eyaml"`
 do
-  if [[ -f $ppfile ]] 
+  if [[ -f $ppfile ]]
   then
-    case $ppfile in 
+    case $ppfile in
     *.pp)
       puppet parser validate $ppfile
-      if [[ $? -ne 0 ]] 
+      if [[ $? -ne 0 ]]
       then
-        echo "$ppfile not validated by puppet parser"
+        echo "$ppfile not validated by puppet parser" 
         puppet_syntax=1
       else
-        echo "$ppfile has been validated by puppet parser"
+        echo "$ppfile has been validated by puppet parser" 
       fi ;;
     *.erb)
       erb -P -x -T '-' "$ppfile" | ruby -c
       if [[ $? -ne 0 ]]
       then
-        echo "$ppfile not a valid erb file"
+        echo "$ppfile not a valid erb file" 
         puppet_syntax=1
       else
-        echo "$ppfile is a valid erb file"
+        echo "$ppfile is a valid erb file" 
       fi ;;
+    *.yaml|*.eyaml)
+      ruby -r yaml -e "YAML.parse(File.open('${ppfile}'))" 
+        if [[ $? -ne 0 ]]
+        then
+            echo -e "ERROR: YAML parse: $ppfile" 
+            puppet_syntax=1
+        else
+            echo -e "OK: $ppfile looks valid" 
+        fi ;;
     esac
   fi
 done
